@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+    <link href="./static/vuetify/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="./static/vuetify/css/vuetify.min.css" rel="stylesheet">
+    <link href="./static/fontawesome-free-6.1.2-web/css/fontawesome.css" rel="stylesheet">
+    <link href="./static/fontawesome-free-6.1.2-web/css/brands.css" rel="stylesheet">
+    <link href="./static/fontawesome-free-6.1.2-web/css/solid.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <title>Pairing and sync</title>
+</head>
+<body>
+<div id="app"></div>
+<script src="./static/vuetify/js/vue.js"></script>
+<script src="./static/vuetify/js/vuetify.js"></script>
+<script type="text/x-template" id="app-template">
+    <v-app>
+        <v-main :style="bgColor">
+            <v-container class="mt-3">
+                <v-row justify="space-around">
+                    <v-sheet :style="index == 0?selectedStyle:notSelectedStyle"
+                             class="justify-center d-flex align-center" @click="onSelected(0)">
+                        <v-img :src="picPrefix + (index == 0?'/sb_icon_square_sel.png?version=2':'/sb_icon_square.png?version=2')"
+                               height="89" max-width="50"></v-img>
+                    </v-sheet>
+                    <v-sheet :style="index == 1?selectedStyle:notSelectedStyle"
+                             class="justify-center d-flex d-flex align-center" @click="onSelected(1)">
+                        <v-img :src="picPrefix + (index == 1?'/sb_icon_round_sel.png?version=2':'/sb_icon_round.png?version=2')" height="89"
+                               max-width="56"></v-img>
+                    </v-sheet>
+                    <v-sheet :style="index == 2?selectedStyle:notSelectedStyle"
+                             class="justify-center d-flex d-flex align-center" @click="onSelected(2)">
+                        <v-img :src="picPrefix + (index == 2?'/sb_icon_wristband_sel.png?version=2':'/sb_icon_wristband.png?version=2')"
+                               height="89" max-width="40"></v-img>
+                    </v-sheet>
+                </v-row>
+                <div v-if="index == 0">
+                    <v-sheet class="mt-5" :style="sheetStyle">
+                        <v-container>
+                            <div style="height: 18px;width: 300px;position:relative">
+                                <div style="position:absolute;top: 16px;width: 142px;height: 6px;z-index: 1">
+                                    <v-img :src="picBasePrefix+'/label_bottom.png?version=2'" max-width="142" height="6"></v-img>
+                                </div>
+                                <div class="subtitle-1 font-weight-black pl-2"
+                                     style="position:absolute;top: 0px;z-index: 2">
+                                    Charge and activate the watch
+                                </div>
+                            </div>
+                            <div class="mt-6 d-flex px-3 py-3" :style="contentPicStyle">
+                                <div class="caption font-weight-medium d-flex align-center mt-6"
+                                     style="height: 11px;margin-right: -1px;">
+                                    <div style="width: 40px;word-break: break-all;">
+                                        Charging cable
+                                    </div>
+
+                                    <div :style="checkCircleStyle" class="ml-2"></div>
+                                    <div :style="checkDividerStyle"></div>
+                                </div>
+                                <v-img :src="picPrefix+'/square/sb_pic_charging_line.png?version=2'" max-width="42" height="76"
+                                       class="mt-4"></v-img>
+                                <v-img :src="picPrefix+'/square/sb_pic_charging_port.png?version=2'" max-width="88" height="102"
+                                       class="ml-4"></v-img>
+                                <div class="caption font-weight-medium d-flex align-center mt-6"
+                                     style="height: 11px;margin-left: -1px;">
+                                    <div :style="checkDividerStyle"></div>
+                                    <div :style="checkCircleStyle" class="mr-2"></div>
+                                    <div style="width: 40px;word-break: break-all;">
+                                        Charging port
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Combine the charging contacts of the magnetic charging cable or the charging stand with the charging contacts of the watch, you can long press to activate the watch and turn it on.
+                            </div>
+                            <div class="d-flex px-5 py-3 justify-center align-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/square/sb_pic_side_button.png?version=2'" max-width="104" height="100"
+                                       class="ml-4"></v-img>
+                                <div class="caption font-weight-medium d-flex align-center"
+                                     style="height: 11px;margin-left: -1px;">
+                                    <div :style="checkDividerStyle"></div>
+                                    <div :style="checkCircleStyle" class="mr-2"></div>
+                                    Side button
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Long press the side button of the watch to power off
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                    <v-sheet class="mt-5" :style="sheetStyle">
+                        <v-container>
+                            <div style="height: 18px;width: 300px;position:relative">
+                                <div style="position:absolute;top: 16px;width: 142px;height: 6px;z-index: 1">
+                                    <v-img :src="picBasePrefix+'/label_bottom.png?version=2'" max-width="142" height="6"></v-img>
+                                </div>
+                                <div class="subtitle-1 font-weight-black pl-2"
+                                     style="position:absolute;top: 0px;z-index: 2">
+                                    Paired watch
+                                </div>
+                            </div>
+                            <div class="mt-6 d-flex px-5 pt-5 justify-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/square/sb_pic_bangding.png?version=2'" max-width="110" height="108"
+                                       class="ml-4"></v-img>
+                                <div>
+                                    <div class="caption font-weight-medium d-flex align-center mt-6"
+                                         style="height: 11px;margin-left: -1px;">
+                                        <div :style="checkDividerStyle"></div>
+                                        <div :style="checkCircleStyle" class="mr-2"></div>
+                                        Scan code pairing
+                                    </div>
+                                    <div class="caption font-weight-medium d-flex align-center mt-8"
+                                         style="height: 11px;margin-left: -70px">
+                                        <svg width="60" height="11" viewBox="0 0 60 11" style="z-index: 10">
+                                            <text font-family="'PingFang SC','Microsoft Yahei'" font-size="6" x="0" y="11" fill="white">Add device</text>
+                                        </svg>
+                                        <div :style="[checkDividerStyle,{width:'41px',zIndex:10}]" class="ml-2"></div>
+                                        <div :style="checkCircleStyle" class="mr-2"></div>
+                                        Search pairing
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Click &quot;Add Device&quot; to search, or click &quot;Scan Code&quot; to pair the watch
+                            </div>
+                            <div class="d-flex px-5 pt-5 justify-center align-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/square/sb_pic_search.png?version=2'" max-width="102" height="108"></v-img>
+                                <div style="position:relative;height: 108px;" class="ml-8 justify-center d-flex">
+                                    <v-img :src="picPrefix+'/square/sb_pic_scan.png?version=2'" max-width="102" height="108"></v-img>
+                                    <div class="white--text" style="position:absolute;z-index: 10;bottom:-5px;font-size: 12px;transform: scale(0.61)">Scan QR code</div>
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Search: Select your watch in the search interface and click to pair
+                            </div>
+                            <div class="my-4 body-2 font-weight-light" style="color: #FF4C4C">
+                                Note: During the binding process, please keep the watch close to the phone (within 1 meters).
+                            </div>
+                            <div class="d-flex px-5 justify-center align-center" :style="contentPicStyle">
+                                <div style="position:relative;height: 98px;" class="ml-8 justify-center d-flex mt-4 mb-4">
+                                    <v-img :src="picPrefix+'/square/sb_pic_watchpaired.png?version=2'" max-width="78" height="98"></v-img>
+                                </div>
+                                <v-icon size="30" class="ml-2">mdi-dots-horizontal</v-icon>
+                                <v-img :src="picPrefix+'/square/sb_pic_paired.png?version=2'" max-width="102" height="108" class="ml-3 mt-4"></v-img>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light d-flex">
+                                Click "<v-img :src="picPrefix+'/square/sb_btn_confirmation.png?version=2'" max-width="14" height="14"></v-img>" on the watch to confirm and complete the binding.
+                            </div>
+                            <div class="my-4 body-2 font-weight-light" style="color: #FF4C4C">
+                                Note: Some watches automatically connect without clicking to confirm.
+                            </div>
+                            <div class="px-10 py-4">
+                                <v-btn dark depressed block color="#3DC3C9" href="starmax://add_device">Add device</v-btn>
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                    <v-sheet class="mt-5" :style="sheetStyle" @click="onQuestion">
+                        <v-container>
+                            <div class="my-5 body-2 font-weight-light">
+                                If the device cannot be bound, please check the following help:
+                            </div>
+                            <div class="d-flex px-5 justify-space-between align-center" :style="contentPicStyle">
+                                <div class="my-5 body-2 font-weight-medium" >
+                                    Device cannot be paired
+                                </div>
+                                <v-icon :size="11" color="grey">fa-solid fa-chevron-right</v-icon>
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                    <v-sheet class="mt-5" :style="sheetStyle">
+                        <v-container>
+                            <div style="height: 18px;width: 300px;position:relative">
+                                <div style="position:absolute;top: 16px;width: 142px;height: 6px;z-index: 1">
+                                    <v-img :src="picBasePrefix+'/label_bottom.png?version=2'" max-width="142" height="6"></v-img>
+                                </div>
+                                <div class="subtitle-1 font-weight-black pl-2"
+                                     style="position:absolute;top: 0px;z-index: 2">
+                                    Pairing Call Bluetooth
+                                </div>
+                            </div>
+                            <div class="my-4 body-1 font-weight-medium">
+                                Turn on call bluetooth:
+                            </div>
+                            <div class="d-flex px-5 py-4 justify-center align-center" :style="contentPicStyle">
+                                <div style="position:relative;height: 98px;">
+                                    <v-img :src="picPrefix+'/square/sb_pic_watchpaired2.png?version=2'" max-width="78" height="98"></v-img>
+                                    <svg width="78" height="11" viewBox="0 0 60 11" style="position:absolute;z-index: 10;top:24px;">
+                                        <text font-family="'PingFang SC','Microsoft Yahei'" font-size="6" x="2" y="9" font-weight="bold" :fill="$vuetify.theme.dark?'white':'black'">Call Blu...</text>
+                                    </svg>
+                                </div>
+                                <div style="position:relative;height: 98px;" class="ml-9">
+                                    <v-img :src="picPrefix+'/square/sb_pic_watchpaired2.png?version=2'" max-width="78" height="98"></v-img>
+                                    <v-img :src="picPrefix+'/square/open.png?version=2'" max-width="41" height="41" style="position: absolute;z-index:20;top: 10px;right: -10px"></v-img>
+                                    <svg width="78" height="11" viewBox="0 0 60 11" style="position:absolute;z-index: 10;top:24px;">
+                                        <text font-family="'PingFang SC','Microsoft Yahei'" font-size="6" x="2" y="9" font-weight="bold" :fill="$vuetify.theme.dark?'white':'black'">Call Blu...</text>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="my-4 body-1 font-weight-medium">
+                                Pairing Call Bluetooth
+                            </div>
+                            <div class="my-4 caption font-weight-light">
+                                Keep the mobile phone system bluetooth turned on;<br />
+                                Enter the mobile phone system Bluetooth, find the device Bluetooth name (GT**CALL-****), and click to connect.<br />
+                                Note: The call bluetooth must be connected in the mobile phone system bluetooth.
+                            </div>
+                            <div class="d-flex px-5 pt-5 justify-center align-center" :style="contentPicStyle">
+                                <div style="position:relative;height: 108px;">
+                                    <v-img :src="picPrefix+'/square/sb_pic_device.png?version=2'" max-width="110" height="108"></v-img>
+                                    <div class="font-weight-black" style="position:absolute;z-index: 10;top:32px;left:10px;font-size: 12px;transform: scale(0.5)">Bluetooth</div>
+                                </div>
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                    <v-sheet class="mt-5" :style="sheetStyle" :class="isIos?'mb-16':''">
+                        <v-container>
+                            <div style="height: 18px;width: 300px;position:relative">
+                                <div style="position:absolute;top: 16px;width: 142px;height: 6px;z-index: 1">
+                                    <v-img :src="picBasePrefix+'/label_bottom.png?version=2'" max-width="142" height="6"></v-img>
+                                </div>
+                                <div class="subtitle-1 font-weight-black pl-2"
+                                     style="position:absolute;top: 0px;z-index: 2">
+                                    Sync watch data
+                                </div>
+                            </div>
+                            <div class="d-flex px-5 pt-5 mt-6 justify-center align-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/square/sb_pic_bluetooth.png?version=2'" max-width="102" height="108"></v-img>
+                                <v-img :src="picPrefix+'/square/sb_pic_refresh.png?version=2'" max-width="102" height="108" class="ml-8"></v-img>
+                            </div>
+                            <div class="my-4 caption font-weight-light">
+                                The pairing is completed, and keep the watch and the mobile phone Bluetooth connected.<br/>
+                                Pull down on the home page and synchronize the watch data to the phone.
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                </div>
+                <div v-if="index == 1">
+                    <v-sheet class="mt-5" :style="sheetStyle">
+                        <v-container>
+                            <div style="height: 18px;width: 300px;position:relative">
+                                <div style="position:absolute;top: 16px;width: 142px;height: 6px;z-index: 1">
+                                    <v-img :src="picBasePrefix+'/label_bottom.png?version=2'" max-width="142" height="6"></v-img>
+                                </div>
+                                <div class="subtitle-1 font-weight-black pl-2"
+                                     style="position:absolute;top: 0px;z-index: 2">
+                                    Charge and activate the watch
+                                </div>
+                            </div>
+                            <div class="mt-6 d-flex px-3 py-3" :style="contentPicStyle">
+                                <div class="caption font-weight-medium d-flex align-center mt-6"
+                                     style="height: 11px;margin-right: -1px;">
+                                    <div style="width: 40px;word-break: break-all;">
+                                        Charging cable
+                                    </div>
+                                    <div :style="checkCircleStyle" class="ml-2"></div>
+                                    <div :style="checkDividerStyle"></div>
+                                </div>
+                                <v-img :src="picPrefix+'/square/sb_pic_charging_line.png?version=2'" max-width="42" height="76"
+                                       class="mt-4"></v-img>
+                                <v-img :src="picPrefix+'/circle/sb_icon_round.png?version=2'" max-width="86" height="100"
+                                       class="ml-4"></v-img>
+                                <div class="caption font-weight-medium d-flex align-center"
+                                     style="height: 11px;margin-left: -1px;margin-top: 80px">
+                                    <div :style="checkDividerStyle"></div>
+                                    <div :style="checkCircleStyle" class="mr-2"></div>
+                                    <div style="width: 40px;word-break: break-all;">
+                                        Charging port
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Combine the charging contacts of the magnetic charging cable or the charging stand with the charging contacts of the watch, you can long press to activate the watch and turn it on.
+                            </div>
+                            <div class="d-flex px-5 py-3 justify-center align-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/circle/sb_icon_roundwatch.png?version=2'" max-width="104" height="100"
+                                       class="ml-4"></v-img>
+                                <div class="caption font-weight-medium d-flex align-center"
+                                     style="height: 11px;margin-left: -1px;">
+                                    <div :style="checkDividerStyle"></div>
+                                    <div :style="checkCircleStyle" class="mr-2"></div>
+                                    Side button
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Long press the side button of the watch to power off
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                    <v-sheet class="mt-5" :style="sheetStyle">
+                        <v-container>
+                            <div style="height: 18px;width: 300px;position:relative">
+                                <div style="position:absolute;top: 16px;width: 142px;height: 6px;z-index: 1">
+                                    <v-img :src="picBasePrefix+'/label_bottom.png?version=2'" max-width="142" height="6"></v-img>
+                                </div>
+                                <div class="subtitle-1 font-weight-black pl-2"
+                                     style="position:absolute;top: 0px;z-index: 2">
+                                    Paired watch
+                                </div>
+                            </div>
+                            <div class="mt-6 d-flex px-5 pt-5 justify-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/square/sb_pic_bangding.png?version=2'" max-width="110" height="108"
+                                       class="ml-4"></v-img>
+                                <div>
+                                    <div class="caption font-weight-medium d-flex align-center mt-6"
+                                         style="height: 11px;margin-left: -1px;">
+                                        <div :style="checkDividerStyle"></div>
+                                        <div :style="checkCircleStyle" class="mr-2"></div>
+                                        Scan code pairing
+                                    </div>
+                                    <div class="caption font-weight-medium d-flex align-center mt-8"
+                                         style="height: 11px;margin-left: -70px">
+                                        <svg width="60" height="11" viewBox="0 0 60 11" style="z-index: 10">
+                                            <text font-family="'PingFang SC','Microsoft Yahei'" font-size="6" x="0" y="11" fill="white">Add device</text>
+                                        </svg>
+                                        <div :style="[checkDividerStyle,{width:'41px',zIndex:10}]" class="ml-2"></div>
+                                        <div :style="checkCircleStyle" class="mr-2"></div>
+                                        Search pairing
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Click &quot;Add Device&quot; to search, or click &quot;Scan Code&quot; to pair the watch
+                            </div>
+                            <div class="d-flex px-5 pt-5 justify-center align-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/square/sb_pic_search.png?version=2'" max-width="102" height="108"></v-img>
+                                <div style="position:relative;height: 108px;" class="ml-8 justify-center d-flex">
+                                    <v-img :src="picPrefix+'/square/sb_pic_scan.png?version=2'" max-width="102" height="108"></v-img>
+                                    <div class="white--text" style="position:absolute;z-index: 10;bottom:-5px;font-size: 12px;transform: scale(0.61)">Scan QR code</div>
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Search: Select your watch in the search interface and click to pair
+                            </div>
+                            <div class="my-4 body-2 font-weight-light" style="color: #FF4C4C">
+                                Note: During the binding process, please keep the watch close to the phone (within 1 meters).
+                            </div>
+                            <div class="d-flex px-5 justify-center align-center" :style="contentPicStyle">
+                                <div style="position:relative;height: 98px;" class="ml-8 justify-center d-flex mt-4 mb-4">
+                                    <v-img :src="picPrefix+'/circle/sb_pic_watchpaired.png?version=2'" max-width="78" height="98"></v-img>
+                                </div>
+                                <v-icon size="30" class="ml-2">mdi-dots-horizontal</v-icon>
+                                <v-img :src="picPrefix+'/circle/sb_pic_paired.png?version=2'" max-width="102" height="108" class="ml-3 mt-4"></v-img>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light d-flex">
+                                Click "<v-img :src="picPrefix+'/square/sb_btn_confirmation.png?version=2'" max-width="14" height="14"></v-img>" on the watch to confirm and complete the binding.
+                            </div>
+                            <div class="my-4 body-2 font-weight-light" style="color: #FF4C4C">
+                                Note: Some watches automatically connect without clicking to confirm.
+                            </div>
+                            <div class="px-10 py-4">
+                                <v-btn dark depressed block color="#3DC3C9" href="starmax://add_device">Add device</v-btn>
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                    <v-sheet class="mt-5" :style="sheetStyle"  @click="onQuestion">
+                        <v-container>
+                            <div class="my-5 body-2 font-weight-light">
+                                If the device cannot be bound, please check the following help:
+                            </div>
+                            <div class="d-flex px-5 justify-space-between align-center" :style="contentPicStyle">
+                                <div class="my-5 body-2 font-weight-medium" >
+                                    Device cannot be paired
+                                </div>
+                                <v-icon :size="11" color="grey">fa-solid fa-chevron-right</v-icon>
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                    <v-sheet class="mt-5" :style="sheetStyle" :class="isIos?'mb-16':''">
+                        <v-container>
+                            <div style="height: 18px;width: 300px;position:relative">
+                                <div style="position:absolute;top: 16px;width: 142px;height: 6px;z-index: 1">
+                                    <v-img :src="picBasePrefix+'/label_bottom.png?version=2'" max-width="142" height="6"></v-img>
+                                </div>
+                                <div class="subtitle-1 font-weight-black pl-2"
+                                     style="position:absolute;top: 0px;z-index: 2">
+                                    Sync watch data
+                                </div>
+                            </div>
+                            <div class="d-flex px-5 pt-5 mt-6 justify-center align-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/square/sb_pic_bluetooth.png?version=2'" max-width="102" height="108"></v-img>
+                                <v-img :src="picPrefix+'/square/sb_pic_refresh.png?version=2'" max-width="102" height="108" class="ml-8"></v-img>
+                            </div>
+                            <div class="my-4 caption font-weight-light">
+                                The pairing is completed, and keep the watch and the mobile phone Bluetooth connected.<br/>
+                                Pull down on the home page and synchronize the watch data to the phone.
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                </div>
+                <div v-if="index == 2">
+                    <v-sheet class="mt-5" :style="sheetStyle">
+                        <v-container>
+                            <div style="height: 18px;width: 300px;position:relative">
+                                <div style="position:absolute;top: 16px;width: 142px;height: 6px;z-index: 1">
+                                    <v-img :src="picBasePrefix+'/label_bottom.png?version=2'" max-width="142" height="6"></v-img>
+                                </div>
+                                <div class="subtitle-1 font-weight-black pl-2"
+                                     style="position:absolute;top: 0px;z-index: 2">
+                                    Charge and activate the bracelet
+                                </div>
+                            </div>
+                            <div class="mt-6 d-flex px-5 py-3 justify-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/wrist/sb_icon_wrist.png?version=2'" max-width="62" height="108"
+                                       class="ml-4"></v-img>
+                                <div class="caption font-weight-medium d-flex align-center"
+                                     style="height: 11px;margin-left: -1px;margin-top: 80px">
+                                    <div :style="checkDividerStyle"></div>
+                                    <div :style="checkCircleStyle" class="mr-2"></div>
+                                    USB charging port
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                The bracelet must be activated by charging before it is used for the first time. (1) Pull the strap and remove the main body of the bracelet; (2) Insert the metal charging terminal of the main body into the USB port to charge the bracelet (please use the specified voltage (5V), be careful not to reverse the connection).
+                                Some bracelets are charged by magnetic attraction.
+                            </div>
+                            <div class="d-flex px-5 py-3 justify-center align-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/wrist/sb_icon_wrist1.png?version=2'" max-width="64" height="108"
+                                       class="ml-4"></v-img>
+                                <div class="caption font-weight-medium d-flex"
+                                     style="height: 11px;margin-left: -1px;margin-top: 67px">
+                                    <div :style="checkDividerStyle"></div>
+                                    <div :style="checkCircleStyle" class="mr-2"></div>
+                                    Power button
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Long press the power button of the bracelet to power on, different models distinguish the touch screen or button.
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                    <v-sheet class="mt-5" :style="sheetStyle">
+                        <v-container>
+                            <div style="height: 18px;width: 300px;position:relative">
+                                <div style="position:absolute;top: 16px;width: 142px;height: 6px;z-index: 1">
+                                    <v-img :src="picBasePrefix+'/label_bottom.png?version=2'" max-width="142" height="6"></v-img>
+                                </div>
+                                <div class="subtitle-1 font-weight-black pl-2"
+                                     style="position:absolute;top: 0px;z-index: 2">
+                                    Paired bracelet
+                                </div>
+                            </div>
+                            <div class="mt-6 d-flex px-5 pt-5 justify-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/wrist/sb_pic_bangding.png?version=2'" max-width="100" height="108"
+                                       class="ml-4"></v-img>
+                                <div>
+                                    <div class="caption font-weight-medium d-flex align-center"
+                                         style="height: 11px;margin-left: -60px;margin-top: 68px">
+                                        <svg width="60" height="11" viewBox="0 0 60 11" style="z-index: 10">
+                                            <text font-family="'PingFang SC','Microsoft Yahei'" font-size="6" x="0" y="11" fill="white">Add device</text>
+                                        </svg>
+                                        <div :style="[checkDividerStyle,{width:'41px',zIndex:10}]" class="ml-2"></div>
+                                        <div :style="checkCircleStyle" class="mr-2"></div>
+                                        Search pairing
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Click &quot;Add Device&quot; to search and bind the bracelet.
+                            </div>
+                            <div class="d-flex px-5 pt-5 justify-center align-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/square/sb_pic_search.png?version=2'" max-width="102" height="108"></v-img>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light">
+                                Search: Select your bracelet in the search interface and click to pair.
+                            </div>
+                            <div class="my-4 body-2 font-weight-light" style="color: #FF4C4C">
+                                Note: Please keep the bracelet close to the phone during the pairing process (within 1 meters).
+                            </div>
+                            <div class="d-flex px-5 justify-center align-center" :style="contentPicStyle">
+                                <div style="position:relative;height: 108px;" class="ml-8 justify-center d-flex mt-4 mb-4">
+                                    <v-img :src="picPrefix+'/wrist/sb_pic_watchpaired.png?version=2'" max-width="36" height="108"></v-img>
+                                </div>
+                                <v-icon size="30" class="ml-2">mdi-dots-horizontal</v-icon>
+                                <v-img :src="picPrefix+'/wrist/sb_pic_paired.png?version=2'" max-width="102" height="108" class="ml-3 mt-6"></v-img>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light d-flex">
+                                <p>Click "<v-img :src="picPrefix+'/square/sb_btn_confirmation.png?version=2'" max-width="14" height="14" align="right"></v-img>" on the bracelet to confirm and complete the pairing.</p>
+                            </div>
+                            <div class="my-4 body-2 font-weight-light" style="color: #FF4C4C">
+                                Note: Some bracelets automatically connect without clicking to confirm.
+                            </div>
+                            <div class="px-10 py-4">
+                                <v-btn dark depressed block color="#3DC3C9" href="starmax://add_device">Add device</v-btn>
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                    <v-sheet class="mt-5" :style="sheetStyle"  @click="onQuestion">
+                        <v-container>
+                            <div class="my-5 body-2 font-weight-light">
+                                If the device cannot be bound, please check the following help:
+                            </div>
+                            <div class="d-flex px-5 justify-space-between align-center" :style="contentPicStyle">
+                                <div class="my-5 body-2 font-weight-medium">
+                                    Device cannot be paired
+                                </div>
+                                <v-icon :size="11" color="grey">fa-solid fa-chevron-right</v-icon>
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                    <v-sheet class="mt-5" :style="sheetStyle" :class="isIos?'mb-16':''">
+                        <v-container>
+                            <div style="height: 18px;width: 300px;position:relative">
+                                <div style="position:absolute;top: 16px;width: 142px;height: 6px;z-index: 1">
+                                    <v-img :src="picBasePrefix+'/label_bottom.png?version=2'" max-width="142" height="6"></v-img>
+                                </div>
+                                <div class="subtitle-1 font-weight-black pl-2"
+                                     style="position:absolute;top: 0px;z-index: 2">
+                                    Sync bracelet data
+                                </div>
+                            </div>
+                            <div class="d-flex px-5 pt-5 mt-6 justify-center align-center" :style="contentPicStyle">
+                                <v-img :src="picPrefix+'/square/sb_pic_bluetooth.png?version=2'" max-width="102" height="108"></v-img>
+                                <v-img :src="picPrefix+'/square/sb_pic_refresh.png?version=2'" max-width="102" height="108" class="ml-8"></v-img>
+                            </div>
+                            <div class="my-4 caption font-weight-light">
+                                The binding is completed, and keep the bracelet and the mobile phone Bluetooth connected.<br/>
+                                Pull down on the home page to synchronize the data of the bracelet to the mobile phone.
+                            </div>
+                        </v-container>
+                    </v-sheet>
+                </div>
+            </v-container>
+        </v-main>
+    </v-app>
+</script>
+<script>
+    new Vue({
+        el: '#app',
+        vuetify: new Vuetify({
+            theme:{dark: false}
+        }),
+        data: function () {
+            const checkCircleStyle = {
+                width: '5px',
+                height: '5px',
+                border: '1px solid #3DC3C9',
+                borderRadius: '50%'
+            }
+
+            const checkDividerStyle = {
+                width: '20px',
+                height: '1px',
+                background: '#3DC3C9',
+            }
+
+            const sheetStyle = {
+                borderRadius: '10px',
+            }
+
+            return {
+                index: 0,
+                sheetStyle,
+                checkDividerStyle,
+                checkCircleStyle
+            }
+        },
+        computed: {
+            selectedStyle:function(){
+              return {
+                  width: '109px',
+                  height: '120px',
+                  background: this.$vuetify.theme.dark?'#2A2A2A':'#FFFFFF',
+                  borderRadius: '10px'
+              };
+            },
+            notSelectedStyle:function(){
+                return {
+                    width: '109px',
+                    height: '120px',
+                    background: 'transparent',
+                    borderRadius: '10px',
+                };
+            },
+            contentPicStyle: function(){
+                return {
+                    borderRadius: '10px',
+                    backgroundColor: this.$vuetify.theme.dark?'#404040':'#F7F7F7'
+                }
+            },
+            picPrefix: function () {
+                return './static/images/bind/'+(this.$vuetify.theme.dark?'dark':'light');
+            },
+            picBasePrefix: function () {
+                return './static/images/bind';
+            },
+            bgColor: function () {
+                return {
+                    backgroundColor: this.$vuetify.theme.dark?'#121212':'#F7F7F7'
+                };
+            },
+            isIos() {
+                var u = navigator.userAgent;
+                var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+                return isiOS;
+            }
+        },
+        methods: {
+            onSelected(index) {
+                this.index = index
+            },
+            onQuestion() {
+                window.location.href = "/client/questions/content/lang/en?dark="
+            }
+        },
+        template: '#app-template'
+    })
+</script>
+</body>
+</html>
